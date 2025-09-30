@@ -42,7 +42,20 @@ Vue.component('task-card', {
             const cards = JSON.parse(localStorage.getItem('cards')) || [];
             const cardIndex = this.$parent.cards.findIndex(c => c === this.card);
             if (cardIndex !== -1) {
-                cards[cardIndex] = this.card;
+                const cardIndex = cards.findIndex(c => c.id === this.card.id); // Ищем карточку по id
+
+                if (cardIndex !== -1) {
+                    cards[cardIndex] = {
+                        ...this.card,
+                        tasks: this.card.tasks.map(task => ({ ...task })) // Глубокая копия задач
+                    };
+                } else {
+                    cards.push({
+                        ...this.card,
+                        tasks: this.card.tasks.map(task => ({ ...task }))
+                    });
+                }
+
                 localStorage.setItem('cards', JSON.stringify(cards));
             }
 
@@ -70,11 +83,11 @@ Vue.component('task-card', {
     },
     mounted() {
         const savedCards = JSON.parse(localStorage.getItem('cards')) || [];
-        const cardIndex = this.$parent.cards.findIndex(c => c === this.card);
-        if (savedCards[cardIndex] && savedCards[cardIndex].tasks) {
-            this.card.tasks = savedCards[cardIndex].tasks;
+        const savedCard = cards.find(c => c.id === this.card.id); // Ищем сохранённую карточку по id
+        if (savedCard && savedCard.tasks) {
+            this.card.tasks = savedCard.tasks.map(task => ({ ...task })); // Глубокая копия задач
         } else {
-        this.card.tasks = []; // Инициализация tasks, если он undefined
+        this.card.tasks = []; // Инициализация пустого масива задач
         }
     }
 
@@ -171,6 +184,7 @@ new Vue({
             if (this.newCardTitle) {
                 this.cards.push({
                     title: this.newCardTitle,
+                    id: Date.now(),
                     tasks: [],
                     moved:false,
                     finalMoved:false,
