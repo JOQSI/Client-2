@@ -5,23 +5,24 @@ Vue.component('task-card', {
     <h3>Задача:{{ card.title }}</h3>
     <ul v-if="card.tasks && card.tasks.length > 0">
             <li v-for="(task, index) in card.tasks" :key="index">
-       <input 
-          type="checkbox" 
-          v-model="task.completed" 
-          :disabled="currentColumnIndex === 2 || (currentColumnIndex === 0 && isFirstColumnLocked)" 
-          @change="checkCompletion"
+                <input 
+                    type="checkbox" 
+                    v-model="task.completed" 
+                    :disabled="currentColumnIndex === 2 || (currentColumnIndex === 0 && isFirstColumnLocked)" 
+                    @change="checkCompletion"
         /> {{ task.text }}
         <span v-if="task.completed" style="color: green">(ВЫПОЛНЕННО)</span>
       </li>
     </ul>
     <div v-if="currentColumnIndex === 0 && !isFirstColumnLocked">
-  <input 
-    type="text" 
-    v-model="newTask" 
-    placeholder="Введите задачи" 
-    @keyup.enter="addTask"
-  />
-  <button @click="addTask" :disabled="card.tasks.length >= 5">Добавить</button>
+      <input 
+                type="text" 
+                v-model="newTask" 
+                placeholder="Введите задачи" 
+                @keyup.enter="addTask"
+            />
+            <button @click="addTask" :disabled="card.tasks.length >= 5">Добавить</button>
+        </div>
 
   <p v-if="card.tasks.length < 3" style="color: red;">Вам нужно добавить минимум 3 задачи!</p>
   <p v-if="card.tasks.length >= 5" style="color: red;">Вы можете добавить не более 5 задач!</p>
@@ -75,6 +76,12 @@ Vue.component('task-card', {
                     } else if (completionRate > 50) {
                         this.$emit('move-to-next', this.card, this.currentColumnIndex);
                     }
+
+                    // Перемещение карточки назад
+                    if (completionRate <= 50 && this.currentColumnIndex === 1) {
+                        this.$emit('move-to-previous', this.card, this.currentColumnIndex);
+                    }
+
                     this.saveTasks();
                 }
             }
@@ -236,6 +243,7 @@ new Vue({
                 this.saveCards();
             }
         }
+
     },
     mounted() {
         const savedCards = JSON.parse(localStorage.getItem('cards'));
