@@ -234,6 +234,7 @@ new Vue({
             const completedTasks = card.tasks.filter(task => task.completed).length;
             const totalTasks = card.tasks.length;
 
+
             if (completedTasks <= totalTasks / 2 && currentColumnIndex > 0) {
                 card.moved = false;
                 if (currentColumnIndex === 2) {
